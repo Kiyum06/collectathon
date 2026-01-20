@@ -1,2 +1,2 @@
-# gba-scenic-route-env
-A template for a base environment to use with the GBA Scenic Route.
+# collectathon
+A template to explore GBA games and collaboration with git/GitHub.
