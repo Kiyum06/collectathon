@@ -112,7 +112,16 @@ int main()
             player.set_x(MIN_X);
         }
 
-        
+        // When the player goes on top it will come from the bottom and if the player goes to the bottom it wil go from top
+
+        if (player.y() < MIN_Y)
+        {
+            player.set_y(MAX_Y);
+        }
+        else if (player.y() > MAX_Y)
+        {
+            player.set_y(MIN_Y);
+        }
             
 
         // Update score display
