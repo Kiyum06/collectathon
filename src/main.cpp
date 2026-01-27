@@ -100,6 +100,20 @@ int main()
 
             score++;
         }
+        // using if statement so that the player loops around the screen. 
+        
+        // When the player goes left and right it comes from both opposite screen
+        if (player.x() < MIN_X)
+        {
+            player.set_x(MAX_X);
+        }
+        else if (player.x() > MAX_X)
+        {
+            player.set_x(MIN_X);
+        }
+
+        
+            
 
         // Update score display
         bn::string<MAX_SCORE_CHARS> score_string = bn::to_string<MAX_SCORE_CHARS>(score);

@@ -137,7 +137,8 @@ Required changes (increasing in difficulty).
 1. Change the backdrop color from black to red
 1. Change the starting position of the player and dot, making new `static constexpr` for starting X and Y of each
 1. Make it so when the player hits start, the game restarts (the player and treasure are sent back to their initial positions and the score is reset to zero)
-1. Make it so that the player loops around the screen (if they go off the left of the screen, they show up on the right, if they go off the bottom of the screen they show up at the top, etc.)
+1. Make it so that the player loops around the screen (if they go off the left of the screen, they show up on the right, if they go off the bottom of the screen they show up at the top, etc.) 
+(We had it go from left and right and up and down from opposite screens)
 1. Make a speed boost. When the player presses 'A', their speed is increased for a short amount of time. They can only use the speed boost 3 times. They get all speed boosts back when the game is restarted by pressing start.
 
 Again, ALL PARTNERS SHOULD BE ADDING COMMITING AND PUSHING FREQUENTLY.
