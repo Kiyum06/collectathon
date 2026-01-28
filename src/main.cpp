@@ -15,7 +15,9 @@
 #include <bn_backdrop.h>
 
 // Pixels / Frame player moves at
-static constexpr bn::fixed SPEED = 3;
+static constexpr bn::fixed SPEED = 2;
+static constexpr int BOOST_DURATION = 60; 
+static constexpr int MAX_BOOSTS = 3;
 
 // Width and height of the the player and treasure bounding boxes
 static constexpr bn::size PLAYER_SIZE = {8, 8};
@@ -57,27 +59,43 @@ int main()
 
     int score = 0;
 
+    int boost_timer = 0;
+    int boosts_left = MAX_BOOSTS;
+    int speed_multiplier = 1;
+
     bn::sprite_ptr player = bn::sprite_items::square.create_sprite(PLAYER_X, PLAYER_Y);
     bn::sprite_ptr treasure = bn::sprite_items::dot.create_sprite(TREASURE_X, TREASURE_Y);
 
     while (true)
     {
+
+        // Activate speed boost
+        if (bn::keypad::a_pressed() && boost_timer == 0 && boosts_left > 0) {
+            speed_multiplier = 2;
+            boost_timer = BOOST_DURATION;
+            boosts_left--;
+        }
+
+        // calculate speed boost
+        bn::fixed move_speed = SPEED * speed_multiplier;
+
+
         // Move player with d-pad
         if (bn::keypad::left_held())
         {
-            player.set_x(player.x() - SPEED);
+            player.set_x(player.x() - move_speed);
         }
         if (bn::keypad::right_held())
         {
-            player.set_x(player.x() + SPEED);
+            player.set_x(player.x() + move_speed);
         }
         if (bn::keypad::up_held())
         {
-            player.set_y(player.y() - SPEED);
+            player.set_y(player.y() - move_speed);
         }
         if (bn::keypad::down_held())
         {
-            player.set_y(player.y() + SPEED);
+            player.set_y(player.y() + move_speed);
         }
 
         // The bounding boxes of the player and treasure, snapped to integer pixels
@@ -100,8 +118,9 @@ int main()
 
             score++;
         }
+
+    
         // using if statement so that the player loops around the screen. 
-        
         // When the player goes left and right it comes from both opposite screen
         if (player.x() < MIN_X)
         {
@@ -122,6 +141,17 @@ int main()
         {
             player.set_y(MIN_Y);
         }
+
+        // Update boost timer
+        if (boost_timer > 0)
+        {
+            boost_timer--;
+
+            if (boost_timer == 0)
+            {
+                speed_multiplier = 1;
+            }
+        }
             
 
         // Update score display
@@ -131,10 +161,6 @@ int main()
                                 score_string,
                                 score_sprites);
 
-        // Update RNG seed every frame so we don't get the same sequence of positions every time
-        rng.update();
-
-        bn::core::update();
 
         // restart the game by pressing start button
         if (bn::keypad::start_pressed()) {
@@ -146,7 +172,18 @@ int main()
             //reset score
             score = 0;
             score_sprites.clear();
+
+            boost_timer = 0;
+            boosts_left = MAX_BOOSTS;
+            speed_multiplier = 1;
         }
+
+        // Update RNG seed every frame so we don't get the same sequence of positions every time
+        rng.update();
+
+        bn::core::update();
+
+        
         
     }
 }

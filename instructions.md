@@ -133,13 +133,15 @@ You will be responsible for making changes to the game. MAKE SURE THAT ALL PARTN
 For each change, first make a plan in instructions.md. Pull, add, commit, push your plan, then implement it. Pull, add, commit and push the implementation. You will be make a lot of commits! This is good! Merge conflicts will likely arise. This is OK and natural. Resolve them as they come up.
 
 Required changes (increasing in difficulty).
-1. Change the speed of the player from 1 to 3
+1. Change the speed of the player from 1 to 2
 1. Change the backdrop color from black to red
 1. Change the starting position of the player and dot, making new `static constexpr` for starting X and Y of each
 1. Make it so when the player hits start, the game restarts (the player and treasure are sent back to their initial positions and the score is reset to zero)
+-We used start_pressed() method to restart the game.
 1. Make it so that the player loops around the screen (if they go off the left of the screen, they show up on the right, if they go off the bottom of the screen they show up at the top, etc.) 
 (We had it go from left and right and up and down from opposite screens)
 1. Make a speed boost. When the player presses 'A', their speed is increased for a short amount of time. They can only use the speed boost 3 times. They get all speed boosts back when the game is restarted by pressing start.
+- We have used some variables to activate the boost mode, calculated the boost speed when it's affecting. The boost mode will be affecting for 60 which is considered as 1 sec each time. 
 
 Again, ALL PARTNERS SHOULD BE ADDING COMMITING AND PUSHING FREQUENTLY.
 
