@@ -19,6 +19,11 @@ static constexpr bn::fixed SPEED = 2;
 static constexpr int BOOST_DURATION = 60; 
 static constexpr int MAX_BOOSTS = 3;
 
+// variables for timer
+static constexpr int GAME_TIME_FRAMES = 60 * 30; // for 30 seconds
+static constexpr int TIMER_X = -70;
+static constexpr int TIMER_Y = -70;
+
 // Width and height of the the player and treasure bounding boxes
 static constexpr bn::size PLAYER_SIZE = {8, 8};
 static constexpr bn::size TREASURE_SIZE = {8, 8};
@@ -63,8 +68,12 @@ int main()
     int boosts_left = MAX_BOOSTS;
     int speed_multiplier = 1;
 
+    int game_timer = GAME_TIME_FRAMES;
+    bn::vector<bn::sprite_ptr, MAX_SCORE_CHARS> timer_sprites = {};
+
     bn::sprite_ptr player = bn::sprite_items::square.create_sprite(PLAYER_X, PLAYER_Y);
     bn::sprite_ptr treasure = bn::sprite_items::dot.create_sprite(TREASURE_X, TREASURE_Y);
+    
 
     while (true)
     {
@@ -162,6 +171,22 @@ int main()
                                 score_sprites);
 
 
+
+        // decresing timer every second
+        if (game_timer > 0) {
+            game_timer--;
+        }   
+        
+        // display timer 
+        int seconds_left = game_timer / 60;
+
+        bn::string<MAX_SCORE_CHARS> timer_string = bn::to_string<MAX_SCORE_CHARS>(seconds_left);
+        timer_sprites.clear();
+        text_generator.generate(TIMER_X, TIMER_Y,
+                                timer_string,
+                                timer_sprites);
+
+
         // restart the game by pressing start button
         if (bn::keypad::start_pressed()) {
 
@@ -176,6 +201,18 @@ int main()
             boost_timer = 0;
             boosts_left = MAX_BOOSTS;
             speed_multiplier = 1;
+        }
+
+        //restart the game once times up
+        if (game_timer == 0){
+            player.set_position(PLAYER_X, PLAYER_Y);
+            treasure.set_position(TREASURE_X, TREASURE_Y);
+
+            score = 0;
+            boost_timer = 0;
+            boosts_left = MAX_BOOSTS;
+            speed_multiplier = 1;
+            game_timer = GAME_TIME_FRAMES;
         }
 
         // Update RNG seed every frame so we don't get the same sequence of positions every time
