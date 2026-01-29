@@ -161,7 +161,7 @@ Again, ALL PARTNERS SHOULD BE ADDING COMMITING AND PUSHING FREQUENTLY.
 ### Making changes
 1. Now, choose someting SMALL that you can feasibly change given your current skillset and the amount of time you have now. Start with something really small!
 1. Make a concrete plan of how you'll do this small change in planning.md. Pull, add, commit, push.
-1. Do the change! It's OK to change your plan if you run into challenges or realize what you decided to do was too big.
+1. Do the change! It's OK to change your plan if you run into challenges or realize what you decided to do was too big. 
 1. Make sure to be testing your game throughout by compiling it and playing it.
 1. Pull, add commit push continously! You feature doesn't need to be finished to be making a commit. Just each time you're making some piece of progress.
 
