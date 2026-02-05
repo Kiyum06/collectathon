@@ -16,7 +16,7 @@
 
 // Pixels / Frame player moves at
 static constexpr bn::fixed SPEED = 2;
-static constexpr int BOOST_DURATION = 60; 
+static constexpr int BOOST_DURATION = 60;
 static constexpr int MAX_BOOSTS = 3;
 // variables for timer
 static constexpr int GAME_TIME_FRAMES = 60 * 30; // for 30 seconds
@@ -24,19 +24,18 @@ static constexpr int TIMER_X = -70;
 static constexpr int TIMER_Y = -70;
 // some colors for changing backdeop
 static constexpr bn::color BG_COLORS[] = {
-    bn::color(31, 0, 0),   // red
-    bn::color(16, 0, 16),   // purple
-    bn::color(0, 0, 31),   // blue
+    bn::color(31, 0, 0),  // red
+    bn::color(16, 0, 16), // purple
+    bn::color(0, 0, 31),  // blue
     bn::color(18, 9, 3),  // brown
-    bn::color(0, 31, 31),  // cyan
-    bn::color(31, 0, 31),  // magenta
+    bn::color(0, 31, 31), // cyan
+    bn::color(31, 0, 31), // magenta
 };
 static constexpr int BG_COLOR_COUNT = 6;
 
 // for obstacle
 static constexpr int OBSTACLE_X = 0;
 static constexpr int OBSTACLE_Y = 0;
-
 
 // Width and height of the the player and treasure bounding boxes
 static constexpr bn::size PLAYER_SIZE = {8, 8};
@@ -56,7 +55,7 @@ static constexpr int MAX_SCORE_CHARS = 11;
 static constexpr int SCORE_X = 70;
 static constexpr int SCORE_Y = -70;
 
-//player location
+// player location
 static constexpr int PLAYER_X = -50;
 static constexpr int PLAYER_Y = -50;
 
@@ -68,7 +67,7 @@ int main()
 {
     bn::core::init();
 
-    //adding backdrop color
+    // adding backdrop color
     bn::backdrop::set_color(bn::color(31, 0, 0));
 
     bn::random rng = bn::random();
@@ -79,11 +78,10 @@ int main()
 
     bn::sprite_text_generator text_generator(common::fixed_8x16_sprite_font);
     text_generator.generate(
-        SCORE_X - 50,   
+        SCORE_X - 50,
         SCORE_Y,
         "Score:",
-        score_label_sprites
-    );
+        score_label_sprites);
 
     int score = 0;
 
@@ -93,26 +91,64 @@ int main()
     int bg_color_index = 0;
     int game_timer = GAME_TIME_FRAMES;
 
+    bool game_over = false;
+
     // will hold the sprite for time
     bn::vector<bn::sprite_ptr, MAX_SCORE_CHARS> timer_sprites = {};
     bn::vector<bn::sprite_ptr, 5> timer_label_sprites;
     text_generator.generate(
-        TIMER_X - 43,   
+        TIMER_X - 43,
         TIMER_Y,
         "Time:",
-        timer_label_sprites
-    );
+        timer_label_sprites);
+
+    // will hold the sprite for game over
+    bn::vector<bn::sprite_ptr, 10> game_over_sprites;
+    bn::vector<bn::sprite_ptr, 16> final_score_sprites;
+    bn::vector<bn::sprite_ptr, 12> restart_sprites;
 
     bn::sprite_ptr player = bn::sprite_items::square.create_sprite(PLAYER_X, PLAYER_Y);
     bn::sprite_ptr treasure = bn::sprite_items::dot.create_sprite(TREASURE_X, TREASURE_Y);
     bn::sprite_ptr obstacle = bn::sprite_items::square.create_sprite(OBSTACLE_X, OBSTACLE_Y);
-    
 
     while (true)
     {
+        if (game_over){
+            // Clear old gameplay text
+            score_sprites.clear();
+            timer_sprites.clear();
+
+            // Show GAME OVER text
+            bn::vector<bn::sprite_ptr, 10> game_over_text;
+            bn::vector<bn::sprite_ptr, 16> final_score_text;
+            bn::vector<bn::sprite_ptr, 12> restart_text;
+
+            text_generator.generate(-100, -10, "GAME OVER", game_over_text);
+
+            bn::string<MAX_SCORE_CHARS> final_score =
+                "Score: " + bn::to_string<MAX_SCORE_CHARS>(score);
+
+            text_generator.generate(-100, 10, final_score, final_score_text);
+            text_generator.generate(-100, 30, "Press START", restart_text);
+
+            // Restart game
+            if (bn::keypad::start_pressed())
+            {
+                game_over = false;
+                score = 0;
+                game_timer = GAME_TIME_FRAMES;
+
+                player.set_position(PLAYER_X, PLAYER_Y);
+                treasure.set_position(TREASURE_X, TREASURE_Y);
+            }
+
+            bn::core::update();
+            continue;
+        }
 
         // Activate speed boost
-        if (bn::keypad::a_pressed() && boost_timer == 0 && boosts_left > 0) {
+        if (bn::keypad::a_pressed() && boost_timer == 0 && boosts_left > 0)
+        {
             speed_multiplier = 2;
             boost_timer = BOOST_DURATION;
             boosts_left--;
@@ -120,7 +156,6 @@ int main()
 
         // calculate speed boost
         bn::fixed move_speed = SPEED * speed_multiplier;
-
 
         // Move player with d-pad
         if (bn::keypad::left_held())
@@ -150,9 +185,9 @@ int main()
                                           TREASURE_SIZE.width(),
                                           TREASURE_SIZE.height());
         bn::rect obstacle_rect = bn::rect(obstacle.x().round_integer(),
-                                        obstacle.y().round_integer(),
-                                        OBSTACLE_SIZE.width(),
-                                        OBSTACLE_SIZE.height());
+                                          obstacle.y().round_integer(),
+                                          OBSTACLE_SIZE.width(),
+                                          OBSTACLE_SIZE.height());
 
         // If the bounding boxes overlap, set the treasure to a new location an increase score
         if (player_rect.intersects(treasure_rect))
@@ -167,28 +202,32 @@ int main()
             // change the backdrop color
             bg_color_index++;
             // Loop back to first color if we reach the end
-            if (bg_color_index >= BG_COLOR_COUNT){
+            if (bg_color_index >= BG_COLOR_COUNT)
+            {
                 bg_color_index = 0;
             }
             // Apply new background color
             bn::backdrop::set_color(BG_COLORS[bg_color_index]);
         }
 
-
         // if player hit the obstacle, game will restart
-        if (player_rect.intersects(obstacle_rect)) {
-            player.set_position(PLAYER_X, PLAYER_Y);
-            treasure.set_position(TREASURE_X, TREASURE_Y);
+        // if (player_rect.intersects(obstacle_rect))
+        // {
+        //     player.set_position(PLAYER_X, PLAYER_Y);
+        //     treasure.set_position(TREASURE_X, TREASURE_Y);
 
-            score = 0;
-            boost_timer = 0;
-            boosts_left = MAX_BOOSTS;
-            speed_multiplier = 1;
-            game_timer = GAME_TIME_FRAMES;
+        //     score = 0;
+        //     boost_timer = 0;
+        //     boosts_left = MAX_BOOSTS;
+        //     speed_multiplier = 1;
+        //     game_timer = GAME_TIME_FRAMES;
+        // }
+
+        if (player_rect.intersects(obstacle_rect)){
+            game_over = true;
         }
 
-    
-        // using if statement so that the player loops around the screen. 
+        // using if statement so that the player loops around the screen.
         // When the player goes left and right it comes from both opposite screen
         if (player.x() < MIN_X)
         {
@@ -220,7 +259,6 @@ int main()
                 speed_multiplier = 1;
             }
         }
-            
 
         // Update score display
         bn::string<MAX_SCORE_CHARS> score_string = bn::to_string<MAX_SCORE_CHARS>(score);
@@ -229,14 +267,13 @@ int main()
                                 score_string,
                                 score_sprites);
 
-
-
         // decresing timer every second
-        if (game_timer > 0) {
+        if (game_timer > 0)
+        {
             game_timer--;
-        }   
-        
-        // display timer 
+        }
+
+        // display timer
         int seconds_left = game_timer / 60;
 
         bn::string<MAX_SCORE_CHARS> timer_string = bn::to_string<MAX_SCORE_CHARS>(seconds_left);
@@ -245,15 +282,15 @@ int main()
                                 timer_string,
                                 timer_sprites);
 
-
         // restart the game by pressing start button
-        if (bn::keypad::start_pressed()) {
+        if (bn::keypad::start_pressed())
+        {
 
-            //reset player's position 
+            // reset player's position
             player.set_position(PLAYER_X, PLAYER_Y);
             // reset treasure's position
             treasure.set_position(TREASURE_X, TREASURE_Y);
-            //reset score
+            // reset score
             score = 0;
             score_sprites.clear();
 
@@ -262,24 +299,26 @@ int main()
             speed_multiplier = 1;
         }
 
-        //restart the game once times up
-        if (game_timer == 0){
-            player.set_position(PLAYER_X, PLAYER_Y);
-            treasure.set_position(TREASURE_X, TREASURE_Y);
+        // restart the game once times up
+        // if (game_timer == 0)
+        // {
+        //     player.set_position(PLAYER_X, PLAYER_Y);
+        //     treasure.set_position(TREASURE_X, TREASURE_Y);
 
-            score = 0;
-            boost_timer = 0;
-            boosts_left = MAX_BOOSTS;
-            speed_multiplier = 1;
-            game_timer = GAME_TIME_FRAMES;
+        //     score = 0;
+        //     boost_timer = 0;
+        //     boosts_left = MAX_BOOSTS;
+        //     speed_multiplier = 1;
+        //     game_timer = GAME_TIME_FRAMES;
+        // }
+
+        if(game_timer == 0){
+            game_over = true;
         }
 
         // Update RNG seed every frame so we don't get the same sequence of positions every time
         rng.update();
 
         bn::core::update();
-
-        
-        
     }
 }
