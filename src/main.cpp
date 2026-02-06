@@ -13,6 +13,7 @@
 #include "bn_sprite_items_square.h"
 #include "common_fixed_8x16_font.h"
 #include <bn_backdrop.h>
+#include "bn_sprite_items_obstacle.h"
 
 // Pixels / Frame player moves at
 static constexpr bn::fixed SPEED = 2;
@@ -109,7 +110,7 @@ int main()
 
     bn::sprite_ptr player = bn::sprite_items::square.create_sprite(PLAYER_X, PLAYER_Y);
     bn::sprite_ptr treasure = bn::sprite_items::dot.create_sprite(TREASURE_X, TREASURE_Y);
-    bn::sprite_ptr obstacle = bn::sprite_items::square.create_sprite(OBSTACLE_X, OBSTACLE_Y);
+    bn::sprite_ptr obstacle = bn::sprite_items::obstacle.create_sprite(OBSTACLE_X, OBSTACLE_Y);
 
     while (true) {
         
